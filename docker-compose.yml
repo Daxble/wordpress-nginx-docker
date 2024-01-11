@@ -52,6 +52,7 @@ services:
   swag:
     image: lscr.io/linuxserver/swag:latest
     container_name: swag
+    hostname: swag
     cap_add:
       - NET_ADMIN
     environment:
