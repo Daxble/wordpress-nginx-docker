@@ -7,13 +7,13 @@ services:
     cap_add:
       - NET_ADMIN
     environment:
-      - URL=daxis.io
+      - URL=${SITE_DOMAIN}
+      - TZ=${TIMEZONE}
       - PUID=1000
       - PGID=1000
-      - TZ=America/Los_Angeles
-      - VALIDATION=dns
-      - DNSPLUGIN=cloudflare
-      - STAGING=true
+      - VALIDATION=${VALIDATION_TYPE}
+      - DNSPLUGIN=${DNS_PLUGIN}
+      - STAGING=${STAGING}
     volumes:
       - ./data/swag:/config
     ports:
