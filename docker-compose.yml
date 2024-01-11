@@ -1,6 +1,54 @@
 version: "3.9"
 
 services:
+  redis:
+    container_name: redis
+    hostname: redis
+    image: redis:7-alpine
+    restart: always
+    networks:
+      - wordpress
+
+  mariadb:
+    container_name: mariadb
+    hostname: mariadb
+    image: mariadb:11-jammy
+    restart: always
+    volumes:
+      - ./data/db:/var/lib/mysql
+    env_file:
+      - ./conf/db/db.env
+    networks:
+      - wordpress
+
+  wordpress:
+    container_name: wordpress
+    hostname: wordpress
+    build:
+      context: ./docker/wordpress
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - mariadb
+      - redis
+    volumes:
+      - ./data/html:/var/www/html
+      - ./conf/wordpress/php.ini:/usr/local/etc/php/conf.d/php_optional.ini
+    env_file:
+      - ./conf/wordpress/wordpress.env
+    environment:
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_REDIS_HOST', 'redis');
+        define('WP_REDIS_PORT', '6379');
+        define('WP_MEMORY_LIMIT', '768M');
+        define('WP_MAX_MEMORY_LIMIT', '1024M');
+        define('WP_DEBUG', false);
+        define('WP_DEBUG_LOG', false);
+        define('WP_DEBUG_DISPLAY', false);
+        define('WP_CACHE', true);
+    networks:
+      - wordpress
+
   swag:
     image: lscr.io/linuxserver/swag:latest
     container_name: swag
@@ -18,7 +66,15 @@ services:
       - CERTPROVIDER=${CERT_PROVIDER}
     volumes:
       - ./data/swag:/config
+      - ./data/html:/var/www/html
     ports:
       - 443:443
       - 80:80
     restart: unless-stopped
+    networks:
+      - wordpress
+
+networks:
+  wordpress:
+    driver: bridge
+    name: wordpress
