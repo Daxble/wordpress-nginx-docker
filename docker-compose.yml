@@ -16,8 +16,11 @@ services:
     restart: always
     volumes:
       - ./data/db:/var/lib/mysql
-    env_file:
-      - ./conf/db/db.env
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     networks:
       - wordpress
 
@@ -33,10 +36,12 @@ services:
       - redis
     volumes:
       - ./data/html:/var/www/html
-      - ./conf/wordpress/php.ini:/usr/local/etc/php/conf.d/php_optional.ini
-    env_file:
-      - ./conf/wordpress/wordpress.env
+      - ./data/swag/php.ini:/usr/local/etc/php/conf.d/php_optional.ini
     environment:
+      WORDPRESS_DB_HOST: ${MYSQL_HOST}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_REDIS_HOST', 'redis');
         define('WP_REDIS_PORT', '6379');
