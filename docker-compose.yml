@@ -14,6 +14,8 @@ services:
       - VALIDATION=${VALIDATION_TYPE}
       - DNSPLUGIN=${DNS_PLUGIN}
       - STAGING=${STAGING}
+      - EMAIL=${EMAIL}
+      - CERTPROVIDER=${CERT_PROVIDER}
     volumes:
       - ./data/swag:/config
     ports:
